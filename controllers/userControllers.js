@@ -4,9 +4,12 @@ const { Thought, User } = require("../models");
 module.exports = {
     async getUsers(req, res) {
         try {
-            const users = await User.find();
+            const users = await User.find()
+                .select('-__v')
+                .populate('friends', '-__v')
             res.json(users);
         } catch (err) {
+            console.error(err)
             res.status(500).json(err);
         }
     },
@@ -65,7 +68,15 @@ module.exports = {
 
     async addFriendToUser(req, res) {
         try {
-
+            const addFriends = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $addToSet: { friends: req.params.friendId } },
+                { runValidators: true, new: true }
+            )
+            if (!addFriends) {
+                return res.status(404).json({ message: 'No user with this id!' });
+            }
+            res.json({ message: 'A new friend added' });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -73,7 +84,15 @@ module.exports = {
 
     async deleteFriendFromUser(req, res) {
         try {
-
+            const deleteFriends = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $pull: { friends: { _id: req.params.friendId } } },
+                { runValidators: true, new: true }
+            )
+            if (!deleteFriends) {
+                return res.status(404).json({ message: 'No user with this id!' });
+            }
+            res.json({ message: 'A friend deleted' });
         } catch (err) {
             res.status(500).json(err);
         }
