@@ -1,7 +1,4 @@
-const { Schema, model } = require('mongoose');
-const formatDate = function () {
-    return this.createdAt.toLocaleDateString('en-US');;
-}
+const { Schema, model, Types } = require('mongoose');
 
 const reactionSchema = new Schema(
     {
@@ -21,12 +18,15 @@ const reactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            get: formatDate
+            get: (Date) => {
+                return Date.toLocaleDateString('en-au');
+            }
         },
     },
     {
         toJSON: {
             virtuals: true,
+            getters: true,
         },
         id: false,
     }

@@ -6,7 +6,8 @@ module.exports = {
     async getThoughts(req, res) {
         try {
             const thoughts = await Thought.find()
-                .select('-__v');
+                .select('-__v')
+            // .populate('reactions')
             res.json(thoughts);
         } catch (err) {
             res.status(500).json(err);
@@ -16,6 +17,8 @@ module.exports = {
     async getSingleThought(req, res) {
         try {
             const thought = await Thought.findOne({ _id: req.params.userId })
+                .select('-__v')
+                .populate('reactions', '-__v')
             if (!thought) {
                 return res.status(404).json({ message: 'No thought with that ID' });
             }
@@ -28,6 +31,13 @@ module.exports = {
 
     async createThought(req, res) {
         try {
+            const newThought = await Thought.create(req.body)
+            res.json(newThought)
+
+            await User.findOneAndUpdate(
+                { username: req.body.username },
+                { $addToSet: { thoughts: { _id: newThought._id } } }
+            )
 
         } catch (err) {
             res.status(500).json(err);

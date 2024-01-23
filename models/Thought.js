@@ -1,7 +1,4 @@
 const { Schema, model } = require('mongoose');
-const formatDate = function () {
-    return this.createdAt.toLocaleDateString('en-US');;
-}
 
 const thoughtSchema = new Schema(
     {
@@ -14,7 +11,9 @@ const thoughtSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            get: formatDate
+            get: (Date) => {
+                return Date.toLocaleDateString('en-au');
+            }
         },
         username: {
             type: String,
@@ -31,6 +30,7 @@ const thoughtSchema = new Schema(
     {
         toJSON: {
             virtuals: true,
+            getters: true,
         },
         id: false,
     }
