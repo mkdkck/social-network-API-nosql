@@ -7,7 +7,7 @@ module.exports = {
         try {
             const thoughts = await Thought.find()
                 .select('-__v')
-            // .populate('reactions')
+                .populate('reactions')
             res.json(thoughts);
         } catch (err) {
             res.status(500).json(err);
@@ -16,7 +16,7 @@ module.exports = {
 
     async getSingleThought(req, res) {
         try {
-            const thought = await Thought.findOne({ _id: req.params.userId })
+            const thought = await Thought.findOne({ _id: req.params.thoughtId })
                 .select('-__v')
                 .populate('reactions', '-__v')
             if (!thought) {
