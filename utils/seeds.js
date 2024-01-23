@@ -95,8 +95,6 @@ connection.once("open", async () => {
             const userIndex = Math.floor(Math.random() * users.length);
             reactions[i].username = users[userIndex].username
         };
-        //seed reaction table
-        const insertedReactions = await Reaction.insertMany(reactions);
 
         // create random user for thoughts
         for (let i = 0; i < thoughts.length; i++) {
@@ -104,14 +102,26 @@ connection.once("open", async () => {
             thoughts[i].username = users[userIndex].username
         };
 
-        //assign reactions to related thoughts
+        //assign random reactions to thoughts
+        //to get random reactions, maximum 4 in a thought
+        function getRandomReactions() {
+            const maxReactions = Math.floor(Math.random() * 5);
+            const randomReactions = [];
+
+            for (let i = 0; i < maxReactions; i++) {
+                const randomIndex = Math.floor(Math.random() * reactions.length);
+                const randomReaction = reactions[randomIndex];
+                randomReactions.push(randomReaction);
+            }
+
+            return randomReactions;
+        }
+        //  assign reactions array to random thought
         thoughts.forEach(thought => {
-            insertedReactions.forEach(reaction => {
-                if (thought.username === reaction.username) {
-                    thought.reactions.push(reaction._id);
-                }
-            });
+            const randomReactions = getRandomReactions();
+            thought.reactions = randomReactions;
         });
+
         //seed thoughts table
         const insertedThoughts = await Thought.insertMany(thoughts);
 
