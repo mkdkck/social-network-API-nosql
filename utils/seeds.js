@@ -94,12 +94,6 @@ connection.once("open", async () => {
         },
         ]
 
-        // create random user for reactions
-        for (let i = 0; i < reactions.length; i++) {
-            const userIndex = Math.floor(Math.random() * users.length);
-            reactions[i].username = users[userIndex].username
-        };
-
         // create random user for thoughts
         for (let i = 0; i < thoughts.length; i++) {
             const userIndex = Math.floor(Math.random() * users.length);
@@ -113,8 +107,18 @@ connection.once("open", async () => {
             const randomReactions = [];
 
             for (let i = 0; i < maxReactions; i++) {
-                const randomIndex = Math.floor(Math.random() * reactions.length);
-                const randomReaction = reactions[randomIndex];
+                //creating random indexs for both user and reaction
+                const userIndex = Math.floor(Math.random() * users.length);
+                const reactionIndex = Math.floor(Math.random() * reactions.length);
+                console.log("userIndex", userIndex)
+                console.log("reactionIndex", reactionIndex)
+
+                //when picking a random reaction, apply a random username init
+                const randomReaction = {
+                    reactionBody: reactions[reactionIndex].reactionBody,
+                    username: users[userIndex].username
+                };
+                //create randomReaction array
                 randomReactions.push(randomReaction);
             }
 
@@ -123,6 +127,8 @@ connection.once("open", async () => {
         //  assign reactions array to random thought
         thoughts.forEach(thought => {
             const randomReactions = getRandomReactions();
+            console.log(randomReactions)
+
             thought.reactions = randomReactions;
         });
 
