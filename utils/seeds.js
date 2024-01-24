@@ -110,8 +110,6 @@ connection.once("open", async () => {
                 //creating random indexs for both user and reaction
                 const userIndex = Math.floor(Math.random() * users.length);
                 const reactionIndex = Math.floor(Math.random() * reactions.length);
-                console.log("userIndex", userIndex)
-                console.log("reactionIndex", reactionIndex)
 
                 //when picking a random reaction, apply a random username init
                 const randomReaction = {
@@ -127,8 +125,6 @@ connection.once("open", async () => {
         //  assign reactions array to random thought
         thoughts.forEach(thought => {
             const randomReactions = getRandomReactions();
-            console.log(randomReactions)
-
             thought.reactions = randomReactions;
         });
 

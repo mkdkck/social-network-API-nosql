@@ -46,7 +46,7 @@ module.exports = {
                 { runValidators: true, new: true }
             );
             if (!updUser) {
-                res.status(404).json({ message: 'No user with this id!' });
+                return res.status(404).json({ message: 'No user with this id!' });
             }
 
             res.json(updUser);
@@ -89,7 +89,7 @@ module.exports = {
         try {
             const deleteFriends = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $pull: { friends: { _id: req.params.friendId } } },
+                { $pull: { friends: req.params.friendId } },
                 { runValidators: true, new: true }
             )
             if (!deleteFriends) {
