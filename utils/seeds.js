@@ -33,22 +33,26 @@ connection.once("open", async () => {
         const users = [{
             username: "ColinL",
             email: "colin@gmail.com",
-            thoughts: []
+            thoughts: [],
+            friends: []
         },
         {
             username: "PeterB",
             email: "peter@hotmial.com",
-            thoughts: []
+            thoughts: [],
+            friends: []
         },
         {
             username: "LucyK",
             email: "lucy@icloud.com",
-            thoughts: []
+            thoughts: [],
+            friends: []
         },
         {
             username: "MollyY",
             email: "molly@office.com",
-            thoughts: []
+            thoughts: [],
+            friends: []
         }];
 
         const thoughts = [{
@@ -90,12 +94,6 @@ connection.once("open", async () => {
         },
         ]
 
-        // create random user for reactions
-        for (let i = 0; i < reactions.length; i++) {
-            const userIndex = Math.floor(Math.random() * users.length);
-            reactions[i].username = users[userIndex].username
-        };
-
         // create random user for thoughts
         for (let i = 0; i < thoughts.length; i++) {
             const userIndex = Math.floor(Math.random() * users.length);
@@ -109,8 +107,16 @@ connection.once("open", async () => {
             const randomReactions = [];
 
             for (let i = 0; i < maxReactions; i++) {
-                const randomIndex = Math.floor(Math.random() * reactions.length);
-                const randomReaction = reactions[randomIndex];
+                //creating random indexs for both user and reaction
+                const userIndex = Math.floor(Math.random() * users.length);
+                const reactionIndex = Math.floor(Math.random() * reactions.length);
+
+                //when picking a random reaction, apply a random username init
+                const randomReaction = {
+                    reactionBody: reactions[reactionIndex].reactionBody,
+                    username: users[userIndex].username
+                };
+                //create randomReaction array
                 randomReactions.push(randomReaction);
             }
 
@@ -133,8 +139,34 @@ connection.once("open", async () => {
                 }
             });
         });
+
         //seed users table
-        await User.insertMany(users)
+        const userdb = await User.insertMany(users)
+
+        //assign random friends to users
+        //to get random friends, maximum 3 in a user,not the userself.
+        const userId = userdb.map((user) => { return user._id });
+        //in order to create random results, using toSpliced to get rid of unwanted numbers, the remaining array is a random needed.
+        //first loop(with i) to loop over all users, nested loop (with j) to get random friend array.
+        for (let i = 0; i < userId.length; i++) {
+            const maxFriends = Math.floor(Math.random() * 4);
+            const exclNum = userId.length - maxFriends;
+            let randomFriends = userId;
+
+            nonOwnUser = userId.toSpliced(i, 1)
+            for (let j = 0; j < exclNum; j++) {
+                const friendqty = 3 - j
+                const randomIndex = Math.floor(Math.random() * friendqty)
+                randomFriends = randomFriends.toSpliced(randomIndex, 1)
+            }
+
+            //send to userDB and update
+            await User.findOneAndUpdate(
+                { _id: userdb[i]._id },
+                { $set: { friends: randomFriends } },
+                { runValidators: true, new: true }
+            )
+        }
 
         console.log('user data created sucessfully')
     } catch (err) {
